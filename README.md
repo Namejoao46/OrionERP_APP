@@ -2,6 +2,6 @@
 
 DESENVOLVEDORES
 - João Paulo;
-- Jennifer;
+- Jenifer;
 - Leandro;
 - Jessica:
