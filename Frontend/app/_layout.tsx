@@ -14,11 +14,9 @@ export {
 } from 'expo-router';
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
+  initialRouteName: 'index',
 };
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -27,7 +25,6 @@ export default function RootLayout() {
     ...FontAwesome.font,
   });
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
@@ -49,9 +46,19 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+    // Forçamos o DarkTheme aqui para combinar com o azul do OrionERP, 
+    // mas você pode manter o colorScheme se preferir o modo automático.
+    <ThemeProvider value={DarkTheme}>
+      <Stack screenOptions={{ headerShown: false }}>
+        {/* A tela index (Splash Animada) */}
+        <Stack.Screen name="index" /> 
+        
+        {/* A tela de Login */}
+        <Stack.Screen name="login" options={{ animation: 'fade' }} /> 
+        
+        {/* O Miolo do App (Tabs) */}
+        <Stack.Screen name="(tabs)" options={{ gestureEnabled: false }} />
+        
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
       </Stack>
     </ThemeProvider>
