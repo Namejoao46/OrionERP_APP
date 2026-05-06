@@ -1,5 +1,5 @@
 const tintColorLight = '#2f95dc';
-const tintColorDark = '#fff';
+const tintColorDark = '#00D1FF';
 
 export default {
   light: {
@@ -11,9 +11,16 @@ export default {
   },
   dark: {
     text: '#fff',
-    background: '#000',
+    background: '#020817', // Cor de fundo da sua imagem
     tint: tintColorDark,
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorDark,
+  },
+  lightBlue: {
+    text: '#1E293B',
+    background: '#F0F9FF', // Azul bem clarinho
+    tint: '#007AFF',       // Azul padrão iOS
+    tabIconDefault: '#64748B',
+    tabIconSelected: '#007AFF',
   },
 };

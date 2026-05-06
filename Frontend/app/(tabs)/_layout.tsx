@@ -1,8 +1,9 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
+import Colors from '../../constants/Colors';
+import { useConfig } from '@/context/ConfigContext';
 
-// Helper para os ícones das abas
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
@@ -11,23 +12,26 @@ function TabBarIcon(props: {
 }
 
 export default function TabLayout() {
+  const { theme } = useConfig();
+  // Garante que o tema exista ou usa o dark como padrão
+  const currentColors = Colors[theme as keyof typeof Colors] || Colors.dark;
+
   return (
     <Tabs
       screenOptions={{
-        // Cores baseadas no tema dark do OrionERP
-        tabBarActiveTintColor: '#38BDF8', 
+        tabBarActiveTintColor: currentColors.tint, 
         tabBarInactiveTintColor: '#8A97AD',
         tabBarStyle: { 
-          backgroundColor: '#010817', 
-          borderTopColor: '#1B2B48',
+          backgroundColor: currentColors.background, 
+          borderTopColor: theme === 'dark' ? '#1B2B48' : '#CBD5E1',
           height: 60,
           paddingBottom: 8
         },
-        headerShown: false, // Escondemos o header padrão para usar o personalizado da Home
+        headerShown: false,
       }}>
       
       <Tabs.Screen
-        name="index" // Deve ser "index" se o arquivo for app/(tabs)/index.tsx
+        name="index"
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
