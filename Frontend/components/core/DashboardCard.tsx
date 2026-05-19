@@ -1,38 +1,151 @@
 import React from 'react';
 import { View, Text, StyleSheet, ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import Svg, { Path } from 'react-native-svg';
 
 interface CardProps {
-  title?: string;
   value: string;
-  subtitle?: string;
+  subtitle: string;
+  percentage?: string;
+  comparison?: string;
+  type?: 'success' | 'danger' | 'warning'; // Define a cor do badge e do gráfico
   style?: ViewStyle;
-  isSmall?: boolean;
 }
 
-export const DashboardCard = ({ title, value, subtitle, style, isSmall }: CardProps) => (
-  <LinearGradient 
-    colors={['rgba(27, 61, 121, 0.8)', 'rgba(10, 25, 53, 0.9)']} 
-    style={[styles.card, isSmall ? styles.smallCard : styles.largeCard, style]}
-  >
-    {title && <Text style={styles.title}>{title}</Text>}
-    <Text style={isSmall ? styles.smallValue : styles.value}>{value}</Text>
-    {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
-  </LinearGradient>
-);
+export const DashboardCard = ({ value, subtitle, percentage, comparison, type = 'success', style }: CardProps) => {
+  // Cores baseadas no status (Figma)
+  const colors = {
+    success: '#00C566',
+    danger: '#FF4D4D',
+    warning: '#FFB800',
+  };
+
+  const statusColor = colors[type];
+
+  return (
+    <LinearGradient colors={['#162641', '#0A1428']} style={[styles.card, style]}>
+      {/* Topo: Valor e Gráfico */}
+      <View style={styles.topRow}>
+        <Text style={styles.value}>{value}</Text>
+        <View style={styles.chartContainer}>
+          <Svg height="20" width="45" viewBox="0 0 100 40">
+            <Path
+              d="M0 30 Q 25 10, 50 25 T 100 15"
+              fill="none"
+              stroke={statusColor} // O gráfico assume a cor do status
+              strokeWidth="8"
+              strokeLinecap="round"
+            />
+          </Svg>
+        </View>
+      </View>
+
+      <Text style={styles.label}>Total de vendas</Text>
+
+      {/* Meio: Nome da Categoria e Badge */}
+      <View style={styles.middleRow}>
+        <Text style={styles.subtitle}>{subtitle}</Text>
+        {percentage && (
+          <View style={[styles.badge, { backgroundColor: statusColor }]}>
+            <Text style={styles.badgeText}>{percentage}</Text>
+          </View>
+        )}
+      </View>
+
+      {/* Rodapé: Comparação */}
+      {comparison && (
+        <Text style={styles.comparisonText}>
+          <Text style={{ color: statusColor }}>{comparison}</Text> comparado a semana anterior
+        </Text>
+      )}
+    </LinearGradient>
+  );
+};
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 15,
-    padding: 15,
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 12,
     borderWidth: 1,
-    borderColor: 'rgba(56, 189, 248, 0.2)',
+    borderColor: '#1E2F4D',
+    width: '48%',
+  },
+  topRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  value: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '800',
+  },
+  chartContainer: {
+    opacity: 0.8,
+  },
+  label: {
+    color: '#94A3B8',
+    fontSize: 10,
+    marginTop: 8,
+  },
+  middleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 2,
+    marginBottom: 10,
+  },
+  subtitle: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '700',
+    flexShrink: 1,
+  },
+  badge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  badgeText: {
+    color: '#FFF',
+    fontSize: 9,
+    fontWeight: '800',
+  },
+  comparisonText: {
+    color: '#64748B',
+    fontSize: 8,
+    fontWeight: '600',
+  },
+  timeCardCustom: {
+    width: '48%',
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#1E2F4D',
+    backgroundColor: '#0F172A', // Fundo escuro para combinar com os outros
     justifyContent: 'center',
   },
-  smallCard: { width: '48%', marginBottom: 15, height: 100 },
-  largeCard: { width: '100%', marginBottom: 15 },
-  title: { color: '#8A97AD', fontSize: 12, marginBottom: 5, textTransform: 'uppercase' },
-  value: { color: '#FFF', fontSize: 24, fontWeight: 'bold' },
-  smallValue: { color: '#FFF', fontSize: 18, fontWeight: 'bold', textAlign: 'center' },
-  subtitle: { color: '#8A97AD', fontSize: 10, marginTop: 5, textAlign: 'center' },
+  timeText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  timeLabel: {
+    color: '#94A3B8',
+    fontSize: 10,
+    fontWeight: '600',
+    marginTop: 4,
+  },
+  
+  // Garanta que o row tenha o wrap para os cards não quebrarem o layout
+  row: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    flexWrap: 'wrap',
+    width: '100%' 
+  },
 });
