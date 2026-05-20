@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Modal } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { router } from 'expo-router'; 
+import { router } from 'expo-router';
 
 // Importações para o Tema e Idioma
-import { useConfig } from '../context/ConfigContext'; 
-import Colors from '../constants/Colors'; 
-import { i18n } from '../constants/Languages'; 
+import { useConfig } from '../context/ConfigContext';
+import Colors from '../constants/Colors';
+import { i18n } from '../constants/Languages';
 
 interface SideMenuProps {
   visible: boolean;
@@ -14,16 +14,19 @@ interface SideMenuProps {
 }
 
 export const SideMenu = ({ visible, onClose }: SideMenuProps) => {
-  // Consumindo o contexto global
   const { theme, language } = useConfig();
-  
-  // Proteção contra valores undefined (evita o erro 'background of undefined')
+
   const currentColors = Colors[theme as keyof typeof Colors] || Colors.dark;
   const texts = i18n[language as keyof typeof i18n] || i18n.pt;
 
   const handleGoToSettings = () => {
-    onClose(); 
-    router.push('/settings'); 
+    onClose();
+    router.push('/settings');
+  };
+
+  const handleGoToChat = () => {
+    onClose();
+    router.push('/(tabs)/two');
   };
 
   return (
@@ -38,29 +41,40 @@ export const SideMenu = ({ visible, onClose }: SideMenuProps) => {
 
           {/* Tradução dinâmica da seção */}
           <Text style={[styles.menuSectionTitle, { color: currentColors.text + '80' }]}>GESTÃO</Text>
-          
-          <MenuItem 
-            icon={<Ionicons name="person-circle" size={22} color={currentColors.tint} />} 
-            label="Usuários" 
+
+          <MenuItem
+            icon={<Ionicons name="person-circle" size={22} color={currentColors.tint} />}
+            label="Usuários"
             textColor={currentColors.text}
+            onPress={() => { onClose(); router.push('/(tabs)'); }}
           />
-          <MenuItem 
-            icon={<MaterialCommunityIcons name="chart-pie" size={22} color={currentColors.tint} />} 
-            label="Setores" 
+          <MenuItem
+            icon={<MaterialCommunityIcons name="chart-pie" size={22} color={currentColors.tint} />}
+            label="Setores"
             textColor={currentColors.text}
+            onPress={() => { onClose(); alert('Módulo de Setores em desenvolvimento'); }}
           />
-          <MenuItem 
-            icon={<Ionicons name="document-text" size={22} color={currentColors.tint} />} 
-            label="Relatórios" 
+          <MenuItem
+            icon={<Ionicons name="document-text" size={22} color={currentColors.tint} />}
+            label="Relatórios"
             textColor={currentColors.text}
+            onPress={() => { onClose(); alert('Módulo de Relatórios em desenvolvimento'); }}
+          />
+
+          {/* 💬 ITEM DO CHAT DA EQUIPE INTEGRADO */}
+          <MenuItem
+            icon={<Ionicons name="chatbox-ellipses" size={22} color="#00D1FF" />}
+            label="Mensagens"
+            textColor={currentColors.text}
+            onPress={handleGoToChat}
           />
 
           {/* Botão de Configurações traduzido e colorido */}
           <TouchableOpacity style={styles.settingsBtn} onPress={handleGoToSettings}>
-              <Ionicons name="settings-outline" size={28} color={currentColors.tint} />
-              <Text style={[styles.settingsText, { color: currentColors.text }]}>
-                {texts.settings.toLowerCase()}
-              </Text>
+            <Ionicons name="settings-outline" size={28} color={currentColors.tint} />
+            <Text style={[styles.settingsText, { color: currentColors.text }]}>
+              {texts.settings.toLowerCase()}
+            </Text>
           </TouchableOpacity>
         </View>
         <TouchableOpacity style={styles.overlayClose} activeOpacity={1} onPress={onClose} />
@@ -69,9 +83,8 @@ export const SideMenu = ({ visible, onClose }: SideMenuProps) => {
   );
 };
 
-// Componente MenuItem atualizado para aceitar cor de texto dinâmica
-const MenuItem = ({ icon, label, textColor }: { icon: any; label: string; textColor: string }) => (
-  <TouchableOpacity style={styles.menuItem}>
+const MenuItem = ({ icon, label, textColor, onPress }: { icon: any; label: string; textColor: string; onPress?: () => void }) => (
+  <TouchableOpacity style={styles.menuItem} onPress={onPress} disabled={!onPress}>
     <View style={styles.menuItemLeft}>
       {icon}
       <Text style={[styles.menuItemText, { color: textColor }]}>{label}</Text>
@@ -83,12 +96,12 @@ const MenuItem = ({ icon, label, textColor }: { icon: any; label: string; textCo
 const styles = StyleSheet.create({
   menuOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.7)', flexDirection: 'row' },
   overlayClose: { flex: 1 },
-  sideMenu: { 
-    width: '75%', 
-    borderRightWidth: 1, 
-    borderRightColor: '#1E2F4D', 
-    padding: 20, 
-    paddingTop: 50 
+  sideMenu: {
+    width: '75%',
+    borderRightWidth: 1,
+    borderRightColor: '#1E2F4D',
+    padding: 20,
+    paddingTop: 50
   },
   logo: { width: 90, height: 25 },
   menuHeaderSide: { marginBottom: 40, alignItems: 'flex-start' },
