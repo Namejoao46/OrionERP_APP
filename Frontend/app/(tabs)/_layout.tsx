@@ -1,8 +1,8 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
-import Colors from '../../constants/Colors';
 import { useConfig } from '@/context/ConfigContext';
+import Colors from '@/constants/Colors';
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
@@ -13,23 +13,22 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const { theme } = useConfig();
-  // Garante que o tema exista ou usa o dark como padrão
   const currentColors = Colors[theme as keyof typeof Colors] || Colors.dark;
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: currentColors.tint, 
+        tabBarActiveTintColor: currentColors.tint,
         tabBarInactiveTintColor: '#8A97AD',
-        tabBarStyle: { 
-          backgroundColor: currentColors.background, 
+        tabBarStyle: {
+          backgroundColor: currentColors.background,
           borderTopColor: theme === 'dark' ? '#1B2B48' : '#CBD5E1',
           height: 60,
           paddingBottom: 8
         },
         headerShown: false,
       }}>
-      
+
       <Tabs.Screen
         name="index"
         options={{
@@ -37,12 +36,12 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
         }}
       />
-      
+
       <Tabs.Screen
         name="two"
         options={{
-          title: 'Gráficos',
-          tabBarIcon: ({ color }) => <TabBarIcon name="bar-chart" color={color} />,
+          title: 'Mensagens',
+          tabBarIcon: ({ color }) => <TabBarIcon name="comments" color={color} />,
         }}
       />
     </Tabs>

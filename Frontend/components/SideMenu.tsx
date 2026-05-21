@@ -1,9 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Modal } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Modal, Alert } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
-// Importações para o Tema e Idioma
 import { useConfig } from '../context/ConfigContext';
 import Colors from '../constants/Colors';
 import { i18n } from '../constants/Languages';
@@ -24,22 +23,31 @@ export const SideMenu = ({ visible, onClose }: SideMenuProps) => {
     router.push('/settings');
   };
 
-  const handleGoToChat = () => {
+  const handleLogout = () => {
     onClose();
-    router.push('/(tabs)/two');
+    Alert.alert(
+      'Sair',
+      'Deseja realmente sair da sua conta?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Sair',
+          style: 'destructive',
+          onPress: () => router.replace('/login'),
+        },
+      ]
+    );
   };
 
   return (
     <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={onClose}>
       <View style={styles.menuOverlay}>
-        {/* Fundo dinâmico baseado no tema */}
         <View style={[styles.sideMenu, { backgroundColor: currentColors.background }]}>
+
           <View style={styles.menuHeaderSide}>
-            {/* Caminho corrigido da imagem */}
             <Image source={require('../assets/images/orion.png')} style={styles.logo} resizeMode="contain" />
           </View>
 
-          {/* Tradução dinâmica da seção */}
           <Text style={[styles.menuSectionTitle, { color: currentColors.text + '80' }]}>GESTÃO</Text>
 
           <MenuItem
@@ -61,21 +69,20 @@ export const SideMenu = ({ visible, onClose }: SideMenuProps) => {
             onPress={() => { onClose(); alert('Módulo de Relatórios em desenvolvimento'); }}
           />
 
-          {/* 💬 ITEM DO CHAT DA EQUIPE INTEGRADO */}
-          <MenuItem
-            icon={<Ionicons name="chatbox-ellipses" size={22} color="#00D1FF" />}
-            label="Mensagens"
-            textColor={currentColors.text}
-            onPress={handleGoToChat}
-          />
-
-          {/* Botão de Configurações traduzido e colorido */}
+          {/* Configurações */}
           <TouchableOpacity style={styles.settingsBtn} onPress={handleGoToSettings}>
-            <Ionicons name="settings-outline" size={28} color={currentColors.tint} />
+            <Ionicons name="settings-outline" size={26} color={currentColors.tint} />
             <Text style={[styles.settingsText, { color: currentColors.text }]}>
               {texts.settings.toLowerCase()}
             </Text>
           </TouchableOpacity>
+
+          {/* Botão Sair */}
+          <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+            <Ionicons name="log-out-outline" size={26} color="#FF4D4D" />
+            <Text style={styles.logoutText}>Sair</Text>
+          </TouchableOpacity>
+
         </View>
         <TouchableOpacity style={styles.overlayClose} activeOpacity={1} onPress={onClose} />
       </View>
@@ -83,7 +90,12 @@ export const SideMenu = ({ visible, onClose }: SideMenuProps) => {
   );
 };
 
-const MenuItem = ({ icon, label, textColor, onPress }: { icon: any; label: string; textColor: string; onPress?: () => void }) => (
+const MenuItem = ({ icon, label, textColor, onPress }: {
+  icon: any;
+  label: string;
+  textColor: string;
+  onPress?: () => void;
+}) => (
   <TouchableOpacity style={styles.menuItem} onPress={onPress} disabled={!onPress}>
     <View style={styles.menuItemLeft}>
       {icon}
@@ -101,7 +113,7 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     borderRightColor: '#1E2F4D',
     padding: 20,
-    paddingTop: 50
+    paddingTop: 50,
   },
   logo: { width: 90, height: 25 },
   menuHeaderSide: { marginBottom: 40, alignItems: 'flex-start' },
@@ -109,6 +121,25 @@ const styles = StyleSheet.create({
   menuItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 25 },
   menuItemLeft: { flexDirection: 'row', alignItems: 'center' },
   menuItemText: { fontSize: 16, fontWeight: '600', marginLeft: 15 },
-  settingsBtn: { position: 'absolute', bottom: 40, left: 20, flexDirection: 'row', alignItems: 'center' },
+  settingsBtn: {
+    position: 'absolute',
+    bottom: 90,
+    left: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   settingsText: { fontSize: 16, fontWeight: '500', marginLeft: 10 },
+  logoutBtn: {
+    position: 'absolute',
+    bottom: 40,
+    left: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logoutText: {
+    fontSize: 16,
+    fontWeight: '700',
+    marginLeft: 10,
+    color: '#FF4D4D',
+  },
 });

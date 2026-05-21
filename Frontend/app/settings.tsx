@@ -1,16 +1,16 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import Colors from '../constants/Colors'; 
+import Colors from '../constants/Colors';
 import { i18n } from '@/constants/Languages';
 import { useConfig } from '@/context/ConfigContext';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { theme, setTheme, language, setLanguage } = useConfig();
-  
+
   const currentColors = Colors[theme as keyof typeof Colors] || Colors.dark;
   const texts = i18n[language as keyof typeof i18n] || i18n.pt;
 
@@ -21,10 +21,25 @@ export default function SettingsScreen() {
     setTheme(themes[nextIndex]);
   };
 
+  const handleLogout = () => {
+    Alert.alert(
+      'Sair',
+      'Deseja realmente sair da sua conta?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Sair',
+          style: 'destructive',
+          onPress: () => router.replace('/login'),
+        },
+      ]
+    );
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: currentColors.background }}>
       <SafeAreaView style={styles.container}>
-        
+
         <View style={styles.profileHeader}>
           <Image source={{ uri: 'https://github.com/Namejoao46.png' }} style={styles.avatar} />
           <View style={styles.profileInfo}>
@@ -40,36 +55,37 @@ export default function SettingsScreen() {
             {texts?.settings?.toUpperCase() || "CONFIGURAÇÕES"}
           </Text>
 
-          <SettingItem 
-            icon="brush-outline" 
-            label={`${texts.theme}: ${theme.toUpperCase()}`} 
+          <SettingItem
+            icon="brush-outline"
+            label={`${texts.theme}: ${theme.toUpperCase()}`}
             color={currentColors.tint}
             textColor={currentColors.text}
             onPress={toggleTheme}
           />
 
-          <SettingItem 
-            icon="language-outline" 
-            label={`${texts.language}: ${language.toUpperCase()}`} 
+          <SettingItem
+            icon="language-outline"
+            label={`${texts.language}: ${language.toUpperCase()}`}
             color={currentColors.tint}
             textColor={currentColors.text}
             onPress={() => setLanguage(language === 'pt' ? 'en' : 'pt')}
           />
 
-          <SettingItem 
-            icon="exit-outline" 
-            label={texts.exit} 
-            color="#FF4B4B" 
+          {/* Logout com função real */}
+          <SettingItem
+            icon="exit-outline"
+            label={texts.exit}
+            color="#FF4B4B"
             textColor={currentColors.text}
-            onPress={() => {}}
+            onPress={handleLogout}
           />
         </ScrollView>
 
         <View style={styles.footer}>
-            <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-                <Ionicons name="arrow-back-circle-outline" size={40} color={currentColors.tint} />
-                <Text style={[styles.backText, { color: currentColors.text }]}>{texts.back}</Text>
-            </TouchableOpacity>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+            <Ionicons name="arrow-back-circle-outline" size={40} color={currentColors.tint} />
+            <Text style={[styles.backText, { color: currentColors.text }]}>{texts.back}</Text>
+          </TouchableOpacity>
         </View>
 
       </SafeAreaView>
