@@ -1,11 +1,17 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  View, Text, StyleSheet, Image, TouchableOpacity,
+  ScrollView, Alert
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import Colors from '../constants/Colors';
 import { i18n } from '@/constants/Languages';
 import { useConfig } from '@/context/ConfigContext';
+import { BASE_URL } from './login';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -14,26 +20,49 @@ export default function SettingsScreen() {
   const currentColors = Colors[theme as keyof typeof Colors] || Colors.dark;
   const texts = i18n[language as keyof typeof i18n] || i18n.pt;
 
+  const [nomeCompleto, setNomeCompleto] = useState('');
+  const [cargo, setCargo] = useState('');
+  const [fotoUri, setFotoUri] = useState<string | null>(null);
+
+  useEffect(() => {
+    const carregarPerfil = async () => {
+      const nome      = await AsyncStorage.getItem('@UserName')      ?? '';
+      const sobrenome = await AsyncStorage.getItem('@UserSobrenome') ?? '';
+      const cargoSalvo = await AsyncStorage.getItem('@UserCargo')    ?? '';
+      const userId    = await AsyncStorage.getItem('@UserId');
+      const fotoB64   = await AsyncStorage.getItem('@UserFotoBase64');
+
+      setNomeCompleto(`${nome} ${sobrenome}`.trim());
+      setCargo(cargoSalvo);
+
+      if (fotoB64) {
+        setFotoUri(`data:image/jpeg;base64,${fotoB64}`);
+      } else if (userId) {
+        setFotoUri(`${BASE_URL}/api/colaboradores/${userId}/foto`);
+      }
+    };
+
+    carregarPerfil();
+  }, []);
+
   const toggleTheme = () => {
     const themes: Array<'dark' | 'light' | 'lightBlue'> = ['dark', 'light', 'lightBlue'];
-    const currentIndex = themes.indexOf(theme);
-    const nextIndex = (currentIndex + 1) % themes.length;
-    setTheme(themes[nextIndex]);
+    const next = (themes.indexOf(theme) + 1) % themes.length;
+    setTheme(themes[next]);
   };
 
-  const handleLogout = () => {
-    Alert.alert(
-      'Sair',
-      'Deseja realmente sair da sua conta?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Sair',
-          style: 'destructive',
-          onPress: () => router.replace('/login'),
+  const handleLogout = async () => {
+    Alert.alert('Sair', 'Deseja realmente sair da sua conta?', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Sair',
+        style: 'destructive',
+        onPress: async () => {
+          await AsyncStorage.clear();
+          router.replace('/login');
         },
-      ]
-    );
+      },
+    ]);
   };
 
   return (
@@ -41,10 +70,18 @@ export default function SettingsScreen() {
       <SafeAreaView style={styles.container}>
 
         <View style={styles.profileHeader}>
-          <Image source={{ uri: 'https://github.com/Namejoao46.png' }} style={styles.avatar} />
+          {fotoUri ? (
+            <Image source={{ uri: fotoUri }} style={styles.avatar} />
+          ) : (
+            <View style={[styles.avatar, styles.avatarPlaceholder]}>
+              <Ionicons name="person" size={36} color="#4E5D78" />
+            </View>
+          )}
           <View style={styles.profileInfo}>
-            <Text style={[styles.userName, { color: currentColors.text }]}>João Paulo</Text>
-            <Text style={styles.userRole}>Desenvolvedor FullStack</Text>
+            <Text style={[styles.userName, { color: currentColors.text }]}>
+              {nomeCompleto || 'Carregando...'}
+            </Text>
+            <Text style={styles.userRole}>{cargo}</Text>
           </View>
         </View>
 
@@ -52,7 +89,7 @@ export default function SettingsScreen() {
 
         <ScrollView contentContainerStyle={styles.content}>
           <Text style={[styles.sectionTitle, { color: currentColors.text }]}>
-            {texts?.settings?.toUpperCase() || "CONFIGURAÇÕES"}
+            {texts?.settings?.toUpperCase() ?? 'CONFIGURAÇÕES'}
           </Text>
 
           <SettingItem
@@ -71,7 +108,6 @@ export default function SettingsScreen() {
             onPress={() => setLanguage(language === 'pt' ? 'en' : 'pt')}
           />
 
-          {/* Logout com função real */}
           <SettingItem
             icon="exit-outline"
             label={texts.exit}
@@ -104,19 +140,20 @@ const SettingItem = ({ icon, label, color, textColor, onPress }: any) => (
 );
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  profileHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
-  avatar: { width: 70, height: 70, borderRadius: 35, borderWidth: 2, borderColor: '#00D1FF' },
-  profileInfo: { flex: 1, marginLeft: 15 },
-  userName: { fontSize: 20, fontWeight: 'bold' },
-  userRole: { color: '#94A3B8', fontSize: 14 },
-  divider: { height: 1, marginVertical: 20 },
-  content: { flex: 1 },
-  sectionTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 25, letterSpacing: 1 },
-  item: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 25 },
-  itemLeft: { flexDirection: 'row', alignItems: 'center' },
-  itemText: { fontSize: 18, marginLeft: 15 },
-  footer: { marginTop: 'auto' },
-  backButton: { flexDirection: 'row', alignItems: 'center', paddingBottom: 20 },
-  backText: { fontSize: 22, fontWeight: 'bold', marginLeft: 10 }
+  container:        { flex: 1, padding: 20 },
+  profileHeader:    { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
+  avatar:           { width: 70, height: 70, borderRadius: 35, borderWidth: 2, borderColor: '#00D1FF' },
+  avatarPlaceholder:{ backgroundColor: '#1B2B48', justifyContent: 'center', alignItems: 'center' },
+  profileInfo:      { flex: 1, marginLeft: 15 },
+  userName:         { fontSize: 20, fontWeight: 'bold' },
+  userRole:         { color: '#94A3B8', fontSize: 14 },
+  divider:          { height: 1, marginVertical: 20 },
+  content:          { flexGrow: 1 },
+  sectionTitle:     { fontSize: 16, fontWeight: 'bold', marginBottom: 25, letterSpacing: 1 },
+  item:             { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 25 },
+  itemLeft:         { flexDirection: 'row', alignItems: 'center' },
+  itemText:         { fontSize: 18, marginLeft: 15 },
+  footer:           { marginTop: 'auto' },
+  backButton:       { flexDirection: 'row', alignItems: 'center', paddingBottom: 20 },
+  backText:         { fontSize: 22, fontWeight: 'bold', marginLeft: 10 },
 });
