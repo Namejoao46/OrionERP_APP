@@ -1,6 +1,5 @@
 package com.example.demo.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -8,13 +7,15 @@ import com.example.demo.model.Colaborador;
 import com.example.demo.repository.ColaboradorRepository;
 
 @Service
-public class gestaoService {
+public class GestaoService {
 
-    @Autowired
-    private ColaboradorRepository repository;
+    private final ColaboradorRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public GestaoService(ColaboradorRepository repository, PasswordEncoder passwordEncoder) {
+        this.repository = repository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public Colaborador cadastrarNovoFuncionario(Colaborador novo, Colaborador adminLogado) {
         novo.setEmpresa(adminLogado.getEmpresa());

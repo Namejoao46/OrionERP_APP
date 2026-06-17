@@ -24,7 +24,7 @@ export default function TabLayout() {
           backgroundColor: currentColors.background,
           borderTopColor: theme === 'dark' ? '#1B2B48' : '#CBD5E1',
           height: 60,
-          paddingBottom: 8
+          paddingBottom: 8,
         },
         headerShown: false,
       }}>
@@ -44,6 +44,16 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="comments" color={color} />,
         }}
       />
+
+      {/* Nova aba: Fiscal / NF-e */}
+      <Tabs.Screen
+        name="fiscal"
+        options={{
+          title: 'Fiscal',
+          tabBarIcon: ({ color }) => <TabBarIcon name="file-text" color={color} />,
+        }}
+      />
+
     </Tabs>
   );
 }

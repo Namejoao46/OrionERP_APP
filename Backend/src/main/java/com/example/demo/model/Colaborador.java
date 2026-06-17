@@ -60,4 +60,46 @@ public class Colaborador implements UserDetails {
     @Override public boolean isAccountNonLocked() { return true; }
     @Override public boolean isCredentialsNonExpired() { return true; }
     @Override public boolean isEnabled() { return true; }
+    public Long getId() { return id; }
+
+public String getLogin() { return login; }
+public void setLogin(String login) { this.login = login; }
+
+public String getSenha() { return senha; }
+public void setSenha(String senha) { this.senha = senha; }
+
+public String getNome() { return nome; }
+public void setNome(String nome) { this.nome = nome; }
+
+public String getSobrenome() { return sobrenome; }
+public void setSobrenome(String sobrenome) { this.sobrenome = sobrenome; }
+
+public String getCargo() { return cargo; }
+public void setCargo(String cargo) { this.cargo = cargo; }
+
+public String getCpf() { return cpf; }
+public void setCpf(String cpf) { this.cpf = cpf; }
+
+public String getMatricula() { return matricula; }
+public void setMatricula(String matricula) { this.matricula = matricula; }
+
+public String getEndereco() { return endereco; }
+public void setEndereco(String endereco) { this.endereco = endereco; }
+
+public String getTipoColaborador() { return tipoColaborador; }
+public void setTipoColaborador(String tipoColaborador) { this.tipoColaborador = tipoColaborador; }
+
+public String getRole() { return role; }
+public void setRole(String role) { this.role = role; }
+
+public Empresa getEmpresa() { return empresa; }
+public void setEmpresa(Empresa empresa) { this.empresa = empresa; }
+
+public byte[] getFoto() { return foto; }
+public void setFoto(byte[] foto) { this.foto = foto; }
+
+public LocalDate getDataNascimento() { return dataNascimento; }
+public void setDataNascimento(LocalDate dataNascimento) {
+    this.dataNascimento = dataNascimento;
+}
 }

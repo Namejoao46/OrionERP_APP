@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.model.Colaborador;
 import com.example.demo.repository.ColaboradorRepository;
 import com.example.demo.service.GestaoService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,13 +19,11 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class ColaboradorController {
 
-    private final ColaboradorRepository repository;
-    private final GestaoService gestaoService;
+    @Autowired
+    private ColaboradorRepository repository;
 
-    public ColaboradorController(ColaboradorRepository repository, GestaoService gestaoService) {
-        this.repository = repository;
-        this.gestaoService = gestaoService;
-    }
+    @Autowired
+    private GestaoService gestaoService;
 
     @GetMapping("/equipe")
     public ResponseEntity<List<Colaborador>> listarEquipe(
