@@ -5,15 +5,21 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "registros_xml")
+@Table(name = "REGISTROS_XML")
 public class RegistroXml {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "GEN_REGISTROS_XML_ID")
+@SequenceGenerator(
+    name = "GEN_REGISTROS_XML_ID",
+    sequenceName = "GEN_REGISTROS_XML_ID",
+    allocationSize = 1
+)
+private Long id;
 
     @Lob 
     private String dadosXml; 

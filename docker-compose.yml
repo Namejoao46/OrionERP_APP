@@ -1,0 +1,34 @@
+services:
+
+  firebird:
+    image: firebirdsql/firebird
+    container_name: orion-firebird
+
+    environment:
+      FIREBIRD_ROOT_PASSWORD: 1811
+
+    ports:
+      - "3051:3050"
+
+    volumes:
+      - ./Backend/database:/firebird/data
+
+  backend:
+    build: ./Backend
+    container_name: orion-backend
+
+    depends_on:
+      - firebird
+
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build: ./Frontend
+    container_name: orion-frontend
+
+    depends_on:
+      - backend
+
+    ports:
+      - "8081:8081"

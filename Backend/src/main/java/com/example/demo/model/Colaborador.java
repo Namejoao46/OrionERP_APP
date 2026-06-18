@@ -17,8 +17,13 @@ import java.util.List;
 public class Colaborador implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "GEN_COLABORADORES_ID")
+@SequenceGenerator(
+    name = "GEN_COLABORADORES_ID",
+    sequenceName = "GEN_COLABORADORES_ID",
+    allocationSize = 1
+)
+private Long id;
 
     @Column(nullable = false, unique = true)
     private String login;

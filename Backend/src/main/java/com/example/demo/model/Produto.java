@@ -11,7 +11,12 @@ import java.time.LocalDateTime;
 public class Produto {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "GEN_PRODUTOS_ID")
+    @SequenceGenerator(
+        name = "GEN_PRODUTOS_ID",
+        sequenceName = "GEN_PRODUTOS_ID",
+        allocationSize = 1
+    )
     private Long id;
 
     @Column(unique = true)
@@ -30,8 +35,13 @@ public class Produto {
     @Column(nullable = false)
     private String status = "ATIVO";
 
+    @Column(precision = 15, scale = 3)
     private BigDecimal estoqueAtual = BigDecimal.ZERO;
+
+    @Column(precision = 15, scale = 2)
     private BigDecimal precoCusto;
+
+    @Column(precision = 15, scale = 2)
     private BigDecimal precoVenda;
 
     @ManyToOne

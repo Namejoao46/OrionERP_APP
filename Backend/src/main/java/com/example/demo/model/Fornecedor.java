@@ -9,8 +9,13 @@ import lombok.Data;
 public class Fornecedor {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "GEN_FORNECEDORES_ID")
+@SequenceGenerator(
+    name = "GEN_FORNECEDORES_ID",
+    sequenceName = "GEN_FORNECEDORES_ID",
+    allocationSize = 1
+)
+private Long id;
 
     @Column(unique = true)
     private String cnpj;

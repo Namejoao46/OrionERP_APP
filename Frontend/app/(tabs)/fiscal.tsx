@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
     View, Text, StyleSheet, TouchableOpacity, ScrollView,
-    ActivityIndicator, Alert, FlatList
+    ActivityIndicator, Alert
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,7 +14,6 @@ import { BASE_URL } from '../login';
 
 const API = `${BASE_URL}/api/nfe`;
 
-// ─── Tipos ───────────────────────────────────────────────────────
 interface ItemPrevia {
     codigoProdutoFornecedor: string;
     descricao: string;
@@ -42,7 +41,6 @@ interface NfePrevia {
 
 type Etapa = 'inicial' | 'carregando' | 'previa' | 'confirmando' | 'sucesso' | 'erro';
 
-// ─── Componente principal ─────────────────────────────────────────
 export default function FiscalScreen() {
     const { theme } = useConfig();
     const C = Colors[theme as keyof typeof Colors] || Colors.dark;
@@ -54,7 +52,6 @@ export default function FiscalScreen() {
 
     const getToken = async () => AsyncStorage.getItem('@OrionToken') ?? '';
 
-    // ── PASSO 1: seleciona XML e busca prévia ──
     const selecionarXml = async () => {
         try {
             const picked = await DocumentPicker.getDocumentAsync({
@@ -62,9 +59,7 @@ export default function FiscalScreen() {
                 copyToCacheDirectory: true,
             });
 
-            if (picked.canceled || !picked.assets?.[0]) {
-                return;
-            }
+            if (picked.canceled || !picked.assets?.[0]) return;
 
             const asset = picked.assets[0];
 
@@ -73,17 +68,17 @@ export default function FiscalScreen() {
             setEtapa('carregando');
 
             const token = await getToken();
-
             const form = new FormData();
 
-            form.append(
-                'xml',
-                {
+            if ((asset as any).file) {
+                form.append('xml', (asset as any).file);
+            } else {
+                form.append('xml', {
                     uri: asset.uri,
                     name: asset.name || 'nfe.xml',
                     type: asset.mimeType || 'application/xml',
-                } as any
-            );
+                } as any);
+            }
 
             const resp = await fetch(`${API}/previa`, {
                 method: 'POST',
@@ -99,7 +94,6 @@ export default function FiscalScreen() {
             console.log('Resposta:', texto);
 
             let json;
-
             try {
                 json = JSON.parse(texto);
             } catch {
@@ -117,17 +111,11 @@ export default function FiscalScreen() {
 
         } catch (e: any) {
             console.error(e);
-
-            setErroMsg(
-                'Não foi possível ler o arquivo: ' +
-                (e?.message || 'Erro desconhecido')
-            );
-
+            setErroMsg('Não foi possível ler o arquivo: ' + (e?.message || 'Erro desconhecido'));
             setEtapa('erro');
         }
     };
 
-    // ── PASSO 2: confirma importação ──
     const confirmarImportacao = async () => {
         if (!previa) return;
 
@@ -152,6 +140,7 @@ export default function FiscalScreen() {
                             });
 
                             const json = await resp.json();
+
                             if (!resp.ok) {
                                 setErroMsg(json.erro ?? 'Erro ao importar.');
                                 setEtapa('erro');
@@ -177,18 +166,14 @@ export default function FiscalScreen() {
         setErroMsg('');
     };
 
-    // ────────────────────────────────────────────────────────────────
     return (
         <View style={{ flex: 1, backgroundColor: C.background }}>
             <SafeAreaView style={styles.safe} edges={['top']}>
-
-                {/* Cabeçalho */}
                 <View style={styles.header}>
                     <Ionicons name="document-text" size={24} color="#00D1FF" />
                     <Text style={[styles.headerTitle, { color: C.text }]}>Importar NF-e</Text>
                 </View>
 
-                {/* ── INICIAL ── */}
                 {etapa === 'inicial' && (
                     <View style={styles.centerContent}>
                         <Ionicons name="cloud-upload-outline" size={80} color="#1E2F4D" />
@@ -202,7 +187,6 @@ export default function FiscalScreen() {
                     </View>
                 )}
 
-                {/* ── CARREGANDO / CONFIRMANDO ── */}
                 {(etapa === 'carregando' || etapa === 'confirmando') && (
                     <View style={styles.centerContent}>
                         <ActivityIndicator size="large" color="#007AFF" />
@@ -212,18 +196,16 @@ export default function FiscalScreen() {
                     </View>
                 )}
 
-                {/* ── ERRO ── */}
                 {etapa === 'erro' && (
                     <View style={styles.centerContent}>
                         <Ionicons name="close-circle" size={60} color="#FF4D4D" />
-                        <Text style={[styles.erroTexto]}>{erroMsg}</Text>
+                        <Text style={styles.erroTexto}>{erroMsg}</Text>
                         <TouchableOpacity style={styles.btnSecundario} onPress={reiniciar}>
                             <Text style={styles.btnSecundarioTexto}>Tentar novamente</Text>
                         </TouchableOpacity>
                     </View>
                 )}
 
-                {/* ── SUCESSO ── */}
                 {etapa === 'sucesso' && resultado && (
                     <View style={styles.centerContent}>
                         <Ionicons name="checkmark-circle" size={70} color="#00C566" />
@@ -240,11 +222,8 @@ export default function FiscalScreen() {
                     </View>
                 )}
 
-                {/* ── PRÉVIA ── */}
                 {etapa === 'previa' && previa && (
                     <ScrollView contentContainerStyle={styles.previaContainer}>
-
-                        {/* Card fornecedor */}
                         <View style={styles.card}>
                             <View style={styles.cardHeaderRow}>
                                 <Text style={styles.cardTitulo}>FORNECEDOR</Text>
@@ -259,7 +238,6 @@ export default function FiscalScreen() {
                             <InfoRow label="Cidade / UF" valor={`${previa.cidade} / ${previa.uf}`} />
                         </View>
 
-                        {/* Card nota */}
                         <View style={styles.card}>
                             <Text style={styles.cardTitulo}>DADOS DA NOTA</Text>
                             <InfoRow label="Número" valor={`${previa.numeroNota} — Série ${previa.serie}`} />
@@ -267,10 +245,7 @@ export default function FiscalScreen() {
                             <InfoRow label="Chave" valor={previa.chaveAcesso} small />
                         </View>
 
-                        {/* Itens */}
-                        <Text style={styles.secaoTitulo}>
-                            PRODUTOS ({previa.itens.length})
-                        </Text>
+                        <Text style={styles.secaoTitulo}>PRODUTOS ({previa.itens.length})</Text>
 
                         {previa.itens.map((item, idx) => (
                             <View key={idx} style={styles.itemCard}>
@@ -292,7 +267,6 @@ export default function FiscalScreen() {
                             </View>
                         ))}
 
-                        {/* Botões de ação */}
                         <View style={styles.acoes}>
                             <TouchableOpacity style={styles.btnSecundario} onPress={reiniciar}>
                                 <Text style={styles.btnSecundarioTexto}>Cancelar</Text>
@@ -302,16 +276,13 @@ export default function FiscalScreen() {
                                 <Text style={styles.btnTexto}>Confirmar importação</Text>
                             </TouchableOpacity>
                         </View>
-
                     </ScrollView>
                 )}
-
             </SafeAreaView>
         </View>
     );
 }
 
-// ─── Sub-componentes ─────────────────────────────────────────────
 const InfoRow = ({ label, valor, small }: { label: string; valor: string; small?: boolean }) => (
     <View style={styles.infoRow}>
         <Text style={styles.infoLabel}>{label}</Text>
@@ -354,36 +325,28 @@ const styles = StyleSheet.create({
     instrucao: { fontSize: 15, textAlign: 'center', color: '#94A3B8', lineHeight: 22 },
     erroTexto: { color: '#FF4D4D', fontSize: 14, textAlign: 'center', marginVertical: 8 },
     sucessoTitulo: { fontSize: 20, fontWeight: 'bold', marginTop: 8 },
-
     btnPrimario: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#007AFF', paddingHorizontal: 24, paddingVertical: 14, borderRadius: 30, marginTop: 8 },
     btnTexto: { color: '#FFF', fontWeight: '700', fontSize: 15 },
     btnSecundario: { paddingHorizontal: 24, paddingVertical: 14, borderRadius: 30, borderWidth: 1, borderColor: '#1E2F4D' },
     btnSecundarioTexto: { color: '#94A3B8', fontWeight: '600', fontSize: 15 },
-
     previaContainer: { padding: 16, paddingBottom: 40 },
     card: { backgroundColor: '#0F172A', borderRadius: 16, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: '#1E2F4D' },
     cardHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
     cardTitulo: { color: '#94A3B8', fontSize: 11, fontWeight: '800', letterSpacing: 1 },
     secaoTitulo: { color: '#94A3B8', fontSize: 11, fontWeight: '800', letterSpacing: 1, marginBottom: 10, marginTop: 8 },
-
     infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 },
     infoLabel: { color: '#475569', fontSize: 12, flex: 1 },
     infoValor: { color: '#F1F5F9', fontSize: 12, fontWeight: '600', flex: 2, textAlign: 'right' },
-
     itemCard: { backgroundColor: '#0A1428', borderRadius: 12, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: '#1E293B' },
     itemHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 },
     itemDescricao: { color: '#F1F5F9', fontSize: 13, fontWeight: '700', flex: 1, marginRight: 8 },
     itemGrade: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-
     miniInfo: { minWidth: '28%' },
     miniLabel: { color: '#475569', fontSize: 9, fontWeight: '700', textTransform: 'uppercase' },
     miniValor: { color: '#CBD5E1', fontSize: 12, fontWeight: '600', marginTop: 2 },
-
     badge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, borderWidth: 1 },
     badgeTexto: { fontSize: 10, fontWeight: '700' },
-
     acoes: { flexDirection: 'row', gap: 12, justifyContent: 'flex-end', marginTop: 20 },
-
     resultadoBox: { backgroundColor: '#0F172A', borderRadius: 16, padding: 20, width: '100%', marginVertical: 16, borderWidth: 1, borderColor: '#1E2F4D' },
     resultadoRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#1E293B' },
     resultadoLabel: { color: '#94A3B8', fontSize: 14 },

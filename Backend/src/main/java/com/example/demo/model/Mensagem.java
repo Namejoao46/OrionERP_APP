@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
@@ -15,8 +16,13 @@ import jakarta.persistence.Table;
 public class Mensagem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "GEN_MENSAGENS_ID")
+@SequenceGenerator(
+    name = "GEN_MENSAGENS_ID",
+    sequenceName = "GEN_MENSAGENS_ID",
+    allocationSize = 1
+)
+private Long id;
 
     private String remetente;
     private String destinatario;

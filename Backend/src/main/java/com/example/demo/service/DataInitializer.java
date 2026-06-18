@@ -1,18 +1,21 @@
 package com.example.demo.service;
 
-import com.example.demo.model.Colaborador;
-import com.example.demo.model.Empresa;
-import com.example.demo.repository.ColaboradorRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import java.io.IOException;
+import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import java.io.IOException;
-import java.time.LocalDate;
+
+import com.example.demo.model.Colaborador;
+import com.example.demo.model.Empresa;
+import com.example.demo.repository.ColaboradorRepository;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
@@ -84,6 +87,28 @@ public class DataInitializer implements CommandLineRunner {
         carregarFoto(jp, "images/admin2.jpg");
         repository.save(jp);
 
+        Colaborador admin3 = repository.findByLogin("admin3").orElse(null);
+
+if (admin3 == null) {
+    admin3 = new Colaborador();
+    admin3.setLogin("admin3");
+    admin3.setSenha(passwordEncoder.encode("789"));
+}
+
+    admin3.setNome("Jenifer");
+    admin3.setSobrenome("Montalvao");
+    admin3.setCargo("Gerente de Projetos");
+    admin3.setCpf("222.222.222-22");
+    admin3.setMatricula("ORION-003");
+    admin3.setDataNascimento(LocalDate.of(1998, 1, 1));
+    admin3.setTipoColaborador("GESTAO");
+    admin3.setRole("ADMIN_DEV");
+    admin3.setEmpresa(empresa);
+
+    carregarFoto(admin3, "images/admin3.jpeg");
+
+    repository.save(admin3);
+        
         System.out.println(">>> Perfis OrionERP carregados no Firebird! <<<");
     }
 

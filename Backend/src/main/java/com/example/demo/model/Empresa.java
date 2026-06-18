@@ -4,13 +4,19 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "empresas")
+@Table(name = "EMPRESAS")
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 public class Empresa {
+    
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "GEN_EMPRESAS_ID")
+@SequenceGenerator(
+    name = "GEN_EMPRESAS_ID",
+    sequenceName = "GEN_EMPRESAS_ID",
+    allocationSize = 1
+)
+private Long id;
 
     @Column(nullable = false)
     private String nomeFantasia;
