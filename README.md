@@ -1,5 +1,26 @@
 # OrionERP_APP
 
+# OrionERP APP
+
+## Requisitos
+
+- Docker Desktop
+
+## Executar
+
+git clone https://github.com/Namejoao46/OrionERP_APP.git
+
+cd OrionERP_APP
+
+docker compose up --build
+
+Frontend:
+http://localhost:8081
+
+Backend:
+http://localhost:8080
+
+
 ## 👥 Colaboradores
 
 | Foto | Nome | GitHub | Função |
