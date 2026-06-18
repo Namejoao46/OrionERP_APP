@@ -1,7 +1,5 @@
 # OrionERP_APP
 
-# OrionERP APP
-
 ## Requisitos
 
 - Docker Desktop
